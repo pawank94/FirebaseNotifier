@@ -62,10 +62,11 @@ public class FirebaseService extends FirebaseMessagingService {
                 new NotificationCompat.Builder(this, channelId)
                         .setSmallIcon(R.drawable.ic_launcher_background)
                         .setContentTitle(getString(R.string.fcm_message))
-                        .setContentText(messageBody)
                         .setSound(defaultSoundUri)
                         .setContentIntent(pendingIntent)
                         .setDeleteIntent(deleteIntent)
+                        .setStyle(new NotificationCompat.BigTextStyle()
+                                .bigText(messageBody))
                         .setPriority(NotificationCompat.PRIORITY_MAX);
 
         NotificationManager notificationManager =

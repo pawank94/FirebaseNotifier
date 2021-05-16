@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">FireBaseNotify</string>
     <string name="default_notification_channel_id">fcm_default_channel</string>
-    <string name="fcm_message">FireBaseNotifier</string>
+    <string name="fcm_message">18+ vaccine center found</string>
 </resources>
