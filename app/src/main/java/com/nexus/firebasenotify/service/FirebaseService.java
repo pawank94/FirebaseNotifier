@@ -1,6 +1,5 @@
 package com.nexus.firebasenotify.service;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -20,14 +19,14 @@ import com.google.firebase.messaging.RemoteMessage;
 import com.nexus.firebasenotify.MainActivity;
 import com.nexus.firebasenotify.R;
 
-import org.json.JSONArray;
-
 import java.util.Map;
 
 public class FirebaseService extends FirebaseMessagingService {
 
     private static final String TAG = "FirebaseService";
     private static final String N_ACTION_FILTER = "NOTIFICATION_DISMISS";
+    private int id = 0;
+    public static boolean multiNotificationEnabled = false;
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -35,7 +34,7 @@ public class FirebaseService extends FirebaseMessagingService {
             Log.d(TAG, "From: " + remoteMessage.getFrom());
             Log.d(TAG, "Notification Message Body: " + remoteMessage.getData().toString());
             Map<String,String> receivedMessage = remoteMessage.getData();
-            sendNotification(receivedMessage.get("text"));
+            sendNotification(receivedMessage.get("default"));
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -70,8 +69,12 @@ public class FirebaseService extends FirebaseMessagingService {
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        long[] pattern = {0,200,100,500};
-        vibrator.vibrate(VibrationEffect.createWaveform(pattern,1));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            //deprecated in API 26
+            vibrator.vibrate(500);
+        }
 
         // Since android Oreo notification channel is needed.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -81,6 +84,16 @@ public class FirebaseService extends FirebaseMessagingService {
             notificationManager.createNotificationChannel(channel);
         }
 
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+        notificationManager.notify(getId() /* ID of notification */, notificationBuilder.build());
+    }
+
+    private int getId() {
+        if (id == Integer.MAX_VALUE) {
+            id = 0;
+        }
+        if (multiNotificationEnabled) {
+            return ++id;
+        }
+        return id;
     }
 }
