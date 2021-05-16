@@ -2,7 +2,9 @@ package com.nexus.firebasenotify;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -42,8 +44,12 @@ public class MainActivity extends AppCompatActivity {
         multiNotificationEnabled.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FirebaseService.multiNotificationEnabled = !FirebaseService.multiNotificationEnabled;
-                Toast.makeText(MainActivity.this, "MultiNotification set to " + FirebaseService.multiNotificationEnabled, Toast.LENGTH_SHORT).show();
+                SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                SharedPreferences.Editor editor = settings.edit();
+                Boolean currentFlag = settings.getBoolean(FirebaseService.MULTI_NOTIFICATION_ENABLED, false);
+                editor.putBoolean(FirebaseService.MULTI_NOTIFICATION_ENABLED, !currentFlag);
+                editor.apply();
+                Toast.makeText(MainActivity.this, "MultiNotification set to " + !currentFlag, Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -5,11 +5,13 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
@@ -26,7 +28,8 @@ public class FirebaseService extends FirebaseMessagingService {
     private static final String TAG = "FirebaseService";
     private static final String N_ACTION_FILTER = "NOTIFICATION_DISMISS";
     private int id = 0;
-    public static boolean multiNotificationEnabled = false;
+    public static String MULTI_NOTIFICATION_ENABLED = "multiNotificationEnabled";
+    private SharedPreferences settings;
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -91,9 +94,16 @@ public class FirebaseService extends FirebaseMessagingService {
         if (id == Integer.MAX_VALUE) {
             id = 0;
         }
-        if (multiNotificationEnabled) {
+        if (isMultiNotificationEnabled()) {
             return ++id;
         }
         return id;
+    }
+
+    private boolean isMultiNotificationEnabled() {
+        if (settings == null) {
+            settings = PreferenceManager.getDefaultSharedPreferences(FirebaseService.this);
+        }
+        return settings.getBoolean(MULTI_NOTIFICATION_ENABLED, false);
     }
 }
